@@ -13,5 +13,6 @@ All powered by cloud-native and decentralized technologies.
 ## Problem Statement
 
 How might we create a secure, user-friendly, and scalable online marketplace for AI models and services — where developers can monetize their AI products and businesses can easily discover, test, and deploy solutions tailored to their unique needs?
-![AI Bazaar Microservices Diagram](Client.png)
+![AI Bazaar Microservices Chart(Client.png)
 
+![AI Bazaar Microservices Diagram](Microservice Architecture for AI Bazzar.png)
