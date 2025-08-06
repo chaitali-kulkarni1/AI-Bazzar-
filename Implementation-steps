@@ -1,0 +1,120 @@
+1. Design Microservices Using Bounded Contexts
+Each microservice should focus on a single responsibility with its own data domain. Use Domain-Driven Design (DDD) to separate logical service boundaries.
+
+Core Services:
+Auth Service
+Catalog Service
+Inference/Model Hosting Service
+Payment Service
+Search Service
+Analytics/Monitoring Service
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------
+2. Technology Stack
+Languages: Python, Node.js, .NET Core
+Databases: Cosmos DB, PostgreSQL
+Cache: Azure Redis
+Eventing: Azure Service Bus, Event Grid
+Monitoring: Application Insights, Azure Monitor
+Deployment: Azure AKS + Helm or Kustomize
+CI/CD: GitHub Actions or Azure DevOps
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------
+3. Containerization with Docker
+Wrap each service in a Docker container to enable portability and reproducibility.
+
+Sample Dockerfile:
+dockerfile
+Copy
+Edit
+FROM python:3.10-slim
+WORKDIR /app
+COPY main.py .
+RUN pip install fastapi uvicorn pydantic
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------
+4. Security Best Practices
+Authentication using JWT or Azure AD B2C
+Role-based access control (RBAC)
+TLS/HTTPS for secure API communication
+API throttling and rate limits via Azure API Management
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------
+5. Service Communication
+REST or gRPC for synchronous communication
+Azure Service Bus or Event Grid for asynchronous communication
+Optional: Use Istio or Linkerd as a service mesh
+Optional: Use Dapr sidecars for abstracted service invocation and state management
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------
+6. API Development
+Use FastAPI or ASP.NET Core for building APIs.
+
+Sample API Code (FastAPI):
+from fastapi import FastAPI
+from pydantic import BaseModel
+app = FastAPI()
+class User(BaseModel):
+    username: str
+    password: str
+@app.post("/register")
+def register(user: User):
+    return {"message": f"User {user.username} registered"}
+@app.post("/login")
+def login(user: User):
+    return {"token": "fake-jwt-token-for-" + user.username}
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------
+7. Health Checks and Observability
+Implement liveness, readiness, and startup probes.
+
+Sample Health Check Endpoint:
+@app.get("/health")
+def health_check():
+    return {"status": "ok"}
+
+Use Application Insights, Azure Monitor, and Prometheus for monitoring and alerts.
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------
+8. Deployment on Azure AKS
+Steps:
+  1.Provision AKS cluster
+  2.Set up namespaces for dev, staging, and prod
+  3.Push Docker images to Azure Container Registry
+  4.Deploy services via Helm charts or Kustomize
+  5.Configure Ingress Controller (NGINX/Azure Gateway)
+  6.Use Horizontal Pod Autoscaler for load management
+  7.Set up DNS with Azure Front Door or Traffic Manager
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------
+9. Scaling and Optimization
+Use KEDA for event-driven autoscaling
+Optimize with Redis caching
+Implement circuit breakers with Dapr or Polly
+Query optimization and connection pooling
+Resource limits and pod affinity rules
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------
+10. CI/CD Setup
+Use GitHub Actions for pipeline automation:
+
+Sample Workflow Snippet (.github/workflows/deploy.yml):
+name: Deploy to AKS
+on:
+  push:
+    branches:
+      - main
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build Docker image
+        run: docker build -t myregistry.azurecr.io/auth-service:latest .
+      - name: Push to ACR
+        run: |
+          echo ${{ secrets.AZURE_CREDENTIALS }} | docker login myregistry.azurecr.io --username ... --password-stdin
+          docker push myregistry.azurecr.io/auth-service:latest
+      - name: Deploy with Helm
+        run: helm upgrade --install auth-service ./helm/auth-service
